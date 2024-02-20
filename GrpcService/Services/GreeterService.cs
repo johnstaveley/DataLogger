@@ -1,5 +1,5 @@
+using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
-using GrpcService;
 
 namespace GrpcService.Services
 {
@@ -17,6 +17,19 @@ namespace GrpcService.Services
             {
                 Message = "Hello " + request.Name
             });
+        }
+
+        public override Task<DeveloperResponse> Developers(Empty request, ServerCallContext context)
+        {
+            // return DeveloperREsponse via grpc
+
+
+            var developerResponse = new DeveloperResponse();
+            developerResponse.Developers.Add(new DeveloperName { Name = "John" });
+            developerResponse.Developers.Add(new DeveloperName { Name = "Daniel" });
+            developerResponse.Developers.Add(new DeveloperName { Name = "Emma" });
+            developerResponse.Developers.Add(new DeveloperName { Name = "Matt" });
+            return Task.FromResult<DeveloperResponse>(developerResponse);
         }
     }
 }
