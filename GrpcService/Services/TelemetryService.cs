@@ -20,6 +20,12 @@ namespace GrpcService.Services
             });
         }
 
+        public override Task<SuccessResponse> SubmitReading(ReadingRequest request, ServerCallContext context)
+        {
+            _logger.LogInformation("Received reading {request}", request);
+            return Task.FromResult(new SuccessResponse { IsSuccess = true });
+        }
+
         public override Task<DeveloperResponse> Developers(Empty request, ServerCallContext context)
         {
             _logger.LogInformation("Sending list of developers");

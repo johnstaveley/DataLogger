@@ -10,16 +10,28 @@ package datalog;
 service DataLog {
 	rpc IsAlive (IsAliveRequest) returns (IsAliveReply);
 	rpc Developers (google.protobuf.Empty) returns (DeveloperResponse);
+	rpc SubmitReading (ReadingRequest) returns (SuccessResponse);
 }
 
-// The request message containing the user's name.
 message IsAliveRequest {
 	string name = 1;
 }
 
-// The response message containing the greetings.
 message IsAliveReply {
 	string message = 1;
+}
+
+message ReadingRequest {
+	string metername = 1;
+	double temperature = 2;
+	double humidity = 3;
+	double pressure = 4;
+	google.protobuf.Timestamp timestamp = 5;
+}
+
+message SuccessResponse {
+	bool IsSuccess = 1;
+	string Message = 2;
 }
 
 message DeveloperResponse {
