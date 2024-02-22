@@ -13,6 +13,7 @@ namespace GrpcService.Services
 
         public override Task<HelloReply> SayHello(HelloRequest request, ServerCallContext context)
         {
+            _logger.LogInformation("Saying hello to {Name}", request.Name);
             return Task.FromResult(new HelloReply
             {
                 Message = "Hello " + request.Name
@@ -21,9 +22,7 @@ namespace GrpcService.Services
 
         public override Task<DeveloperResponse> Developers(Empty request, ServerCallContext context)
         {
-            // return DeveloperREsponse via grpc
-
-
+            _logger.LogInformation("Sending list of developers");
             var developerResponse = new DeveloperResponse();
             developerResponse.Developers.Add(new DeveloperName { Name = "John" });
             developerResponse.Developers.Add(new DeveloperName { Name = "Daniel" });
