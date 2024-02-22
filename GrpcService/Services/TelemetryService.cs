@@ -3,18 +3,18 @@ using Grpc.Core;
 
 namespace GrpcService.Services
 {
-    public class GreeterService : Greeter.GreeterBase
+    public class TelemetryService : DataLog.DataLogBase
     {
-        private readonly ILogger<GreeterService> _logger;
-        public GreeterService(ILogger<GreeterService> logger)
+        private readonly ILogger<TelemetryService> _logger;
+        public TelemetryService(ILogger<TelemetryService> logger)
         {
             _logger = logger;
         }
 
-        public override Task<HelloReply> SayHello(HelloRequest request, ServerCallContext context)
+        public override Task<IsAliveReply> IsAlive(IsAliveRequest request, ServerCallContext context)
         {
-            _logger.LogInformation("Saying hello to {Name}", request.Name);
-            return Task.FromResult(new HelloReply
+            _logger.LogInformation("Responding to {Name}", request.Name);
+            return Task.FromResult(new IsAliveReply
             {
                 Message = "Hello " + request.Name
             });

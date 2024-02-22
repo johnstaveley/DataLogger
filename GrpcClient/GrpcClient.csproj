@@ -20,8 +20,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Protobuf Include="..\GrpcService\Protos\greet.proto" GrpcServices="Client">
-      <Link>Protos\greet.proto</Link>
+    <Protobuf Include="..\GrpcService\Protos\datalog.proto" GrpcServices="Client">
+      <Link>Protos\datalog.proto</Link>
     </Protobuf>
   </ItemGroup>
 </Project>

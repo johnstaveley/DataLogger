@@ -17,13 +17,14 @@ namespace GrpcClient
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            Thread.Sleep(5000);
             while (!stoppingToken.IsCancellationRequested)
             {
                 var serviceUrl = _configuration.GetValue<string>("ServiceUrl");
                 var channel = GrpcChannel.ForAddress(serviceUrl);
-                var client = new Greeter.GreeterClient(channel);
+                var client = new DataLog.DataLogClient(channel);
                 var name = Guid.NewGuid().ToString();
-                var reply = await client.SayHelloAsync(new HelloRequest { Name = name });
+                var reply = await client.IsAliveAsync(new IsAliveRequest { Name = name });
 
                 if (_logger.IsEnabled(LogLevel.Information))
                 {
