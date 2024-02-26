@@ -37,15 +37,16 @@ namespace GrpcService.Services
             return Task.FromResult<DeveloperResponse>(developerResponse);
         }
 
-        public async override Task<Empty> SubmitStream(IAsyncStreamReader<ReadingRequest> requestStream, ServerCallContext context)
+        public async override Task SubmitStream(IAsyncStreamReader<ReadingRequest> requestStream, 
+            IServerStreamWriter<SuccessResponse> responseStream,
+            ServerCallContext context)
         {
             while (await requestStream.MoveNext())
             {
                 var currentReading = requestStream.Current;
                 _logger.LogInformation("Received reading {request}", currentReading);
-
+                await responseStream.WriteAsync(new SuccessResponse { IsSuccess = true });
             }
-            return new Empty();
         }
     }
 }

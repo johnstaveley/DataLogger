@@ -10,7 +10,7 @@ service DataLog {
 	rpc IsAlive (IsAliveRequest) returns (IsAliveReply);
 	rpc Developers (google.protobuf.Empty) returns (DeveloperResponse);
 	rpc SubmitReading (ReadingRequest) returns (SuccessResponse);
-	rpc SubmitStream (stream ReadingRequest) returns (google.protobuf.Empty); 
+	rpc SubmitStream (stream ReadingRequest) returns (stream SuccessResponse);
 }
 
 message IsAliveRequest {

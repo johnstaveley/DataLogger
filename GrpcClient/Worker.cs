@@ -44,18 +44,25 @@ public class Worker : BackgroundService
             var serviceUrl = _configuration.GetValue<string>("ServiceUrl");
             var channel = GrpcChannel.ForAddress(serviceUrl);
             var client = new DataLog.DataLogClient(channel);
-            var streamingRequest = client.SubmitStream();
+            var stream = client.SubmitStream();
             SuccessResponse reply;
             if (useStream)
             {
                 for (int i = 0; i < 10; i++)
                 {
                     var readingRequest = _generator.NewReading();
-                    await streamingRequest.RequestStream.WriteAsync(readingRequest);
+                    await stream.RequestStream.WriteAsync(readingRequest);
                     await Task.Delay(400);
                 }
-                await streamingRequest.RequestStream.CompleteAsync();
-                //var result = await streamingRequest.ResponseAsync;
+                await stream.RequestStream.CompleteAsync();
+                while (await stream.ResponseStream.MoveNext(new CancellationToken()))
+                {
+                    reply = stream.ResponseStream.Current;
+                    if (_logger.IsEnabled(LogLevel.Information))
+                    {
+                        _logger.LogInformation("Response {reply} running at: {time}", reply.IsSuccess, DateTimeOffset.Now);
+                    }
+                }
             }
             else
             {
