@@ -8,10 +8,12 @@ namespace GrpcService.Services
     //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class TelemetryService : DataLog.DataLogBase
     {
+        private readonly JwtTokenValidationService _tokenValidationService;
         private readonly ILogger<TelemetryService> _logger;
-        public TelemetryService(ILogger<TelemetryService> logger)
+        public TelemetryService(JwtTokenValidationService tokenValidationService, ILogger<TelemetryService> logger)
         {
             _logger = logger;
+            _tokenValidationService = tokenValidationService;
         }
 
         public override Task<IsAliveReply> IsAlive(IsAliveRequest request, ServerCallContext context)
@@ -50,6 +52,12 @@ namespace GrpcService.Services
                 _logger.LogInformation("Received reading {request}", currentReading);
                 await responseStream.WriteAsync(new SuccessResponse { IsSuccess = true });
             }
+        }
+
+        [AllowAnonymous]
+        public override Task<TokenResponse> Authenticate(TokenRequest request, ServerCallContext context)
+        {
+            return base.Authenticate(request, context);
         }
     }
 }
