@@ -1,3 +1,4 @@
+using Grpc.Core;
 using Grpc.Net.Client;
 using GrpcService;
 
@@ -37,44 +38,50 @@ public class Worker : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        Thread.Sleep(5000);
+        Thread.Sleep(5000); // Wait for the gRPC service to start
         var useStream = true;
         while (!stoppingToken.IsCancellationRequested)
         {
-            var serviceUrl = _configuration.GetValue<string>("ServiceUrl");
-            var channel = GrpcChannel.ForAddress(serviceUrl);
-            var client = new DataLog.DataLogClient(channel);
-            var stream = client.SubmitStream();
-            SuccessResponse reply;
-            if (useStream)
+            try
             {
-                for (int i = 0; i < 10; i++)
+                var serviceUrl = _configuration.GetValue<string>("ServiceUrl");
+                var channel = GrpcChannel.ForAddress(serviceUrl);
+                var client = new DataLog.DataLogClient(channel);
+                var stream = client.SubmitStream();
+                SuccessResponse reply;
+                if (useStream)
+                {
+                    for (int i = 0; i < 10; i++)
+                    {
+                        var readingRequest = _generator.NewReading();
+                        await stream.RequestStream.WriteAsync(readingRequest);
+                        await Task.Delay(400);
+                    }
+                    await stream.RequestStream.CompleteAsync();
+                    while (await stream.ResponseStream.MoveNext(new CancellationToken()))
+                    {
+                        reply = stream.ResponseStream.Current;
+                        if (_logger.IsEnabled(LogLevel.Information))
+                        {
+                            _logger.LogInformation("Response {reply} running at: {time}", reply.IsSuccess, DateTimeOffset.Now);
+                        }
+                    }
+                }
+                else
                 {
                     var readingRequest = _generator.NewReading();
-                    await stream.RequestStream.WriteAsync(readingRequest);
-                    await Task.Delay(400);
-                }
-                await stream.RequestStream.CompleteAsync();
-                while (await stream.ResponseStream.MoveNext(new CancellationToken()))
-                {
-                    reply = stream.ResponseStream.Current;
+                    reply = await client.SubmitReadingAsync(readingRequest);
                     if (_logger.IsEnabled(LogLevel.Information))
                     {
                         _logger.LogInformation("Response {reply} running at: {time}", reply.IsSuccess, DateTimeOffset.Now);
                     }
                 }
+                await Task.Delay(1000, stoppingToken);
             }
-            else
+            catch (RpcException ex)
             {
-                var readingRequest = _generator.NewReading();
-                reply = await client.SubmitReadingAsync(readingRequest);
-                if (_logger.IsEnabled(LogLevel.Information))
-                {
-                    _logger.LogInformation("Response {reply} running at: {time}", reply.IsSuccess, DateTimeOffset.Now);
-                }
+                _logger.LogError("Error calling gRPC service: {Message}", ex.Message);
             }
-
-            await Task.Delay(1000, stoppingToken);
         }
     }
 }
