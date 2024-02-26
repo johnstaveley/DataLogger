@@ -1,8 +1,11 @@
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 
 namespace GrpcService.Services
 {
+    //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class TelemetryService : DataLog.DataLogBase
     {
         private readonly ILogger<TelemetryService> _logger;

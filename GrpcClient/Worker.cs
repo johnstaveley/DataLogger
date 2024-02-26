@@ -39,7 +39,7 @@ public class Worker : BackgroundService
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         Thread.Sleep(5000); // Wait for the gRPC service to start
-        var useStream = true;
+        var useStream = false;
         while (!stoppingToken.IsCancellationRequested)
         {
             try
