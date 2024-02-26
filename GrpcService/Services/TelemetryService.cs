@@ -36,5 +36,16 @@ namespace GrpcService.Services
             developerResponse.Developers.Add(new DeveloperName { Name = "Matt" });
             return Task.FromResult<DeveloperResponse>(developerResponse);
         }
+
+        public async override Task<Empty> SubmitStream(IAsyncStreamReader<ReadingRequest> requestStream, ServerCallContext context)
+        {
+            while (await requestStream.MoveNext())
+            {
+                var currentReading = requestStream.Current;
+                _logger.LogInformation("Received reading {request}", currentReading);
+
+            }
+            return new Empty();
+        }
     }
 }
