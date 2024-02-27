@@ -1,4 +1,3 @@
-npm install
 # Add tools to path
 if ($env:path -notcontains "grpc-tools") {
 	$env:path = $env:path + ";./node_modules/.bin/;./node_modules/grpc-tools/bin/;./node_modules/protoc-gen-grpc-web/bin/;"

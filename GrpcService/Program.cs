@@ -1,6 +1,5 @@
 using GrpcService.Model;
 using GrpcService.Services;
-using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,9 +12,8 @@ builder.Services.AddAuthentication()
   });
 builder.Services.AddAuthorization();
 builder.Services.AddCors();
+// TODO: Might want to add in an actual authorization provider here
 //builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = false)
-    // TODO: Add in auth provider here
-    ;
 builder.Services.AddGrpc(config => config.EnableDetailedErrors = true);
 
 var app = builder.Build();
