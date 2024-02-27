@@ -1,6 +1,7 @@
 const { IsAliveRequest, IsAliveReply, ReadingRequest, SuccessResponse, DeveloperResponse, DeveloperName, TokenRequest, TokenResponse } = require("./datalog_pb.js");
 const { DataLogClient } = require("./datalog_grpc_web_pb.js");
 const { Timestamp } = require('google-protobuf/google/protobuf/timestamp_pb.js');
+const { Metadata } = require("./node_modules/@grpc/grpc-js/build/src/metadata.js");
 
 const theLog = document.getElementById("theLog");
 const theButton = document.getElementById("theButton");
@@ -32,9 +33,10 @@ function Authenticate(client) {
             addToLog("Authenticated: Token received");
             return true;
         }
-    } catch (RpcException ex)
+    } catch (exception)
     {
-        _logger.LogError("Error authenticating: {Message}", ex.Message);
+        addToLog("Exception thrown");
+        console.log(exception);
     }
     return false;
 }
@@ -51,6 +53,8 @@ theButton.addEventListener("click", function () {
         isAliveRequest.setName("John");
 
         addToLog("Calling Service");
+        var headers = new Metadata();
+        headers.Add("Authorization", "Bearer " + token);
 
         client.isAlive(isAliveRequest, {}, function (err, response) {
             if (err) {

@@ -16,4 +16,4 @@ $files = Get-ChildItem 'GrpcService/Protos/*'
 Get-ChildItem $files | Move-Item -Destination { $_.Directory.Parent.Parent.FullName }
 rmdir GrpcService -recurse -force
 # Build proxy files in development mode (This will prompt you to install some packages on the first run)
-npx webpack -o ../wwwroot/js/datalog/ ./send.js --mode development
+#npx webpack -o ../wwwroot/js/datalog/ ./send.js --mode development

@@ -261,5 +261,66 @@ proto.datalog.DataLogPromiseClient.prototype.submitReading =
 };
 
 
+/**
+ * @const
+ * @type {!grpc.web.MethodDescriptor<
+ *   !proto.datalog.TokenRequest,
+ *   !proto.datalog.TokenResponse>}
+ */
+const methodDescriptor_DataLog_Authenticate = new grpc.web.MethodDescriptor(
+  '/datalog.DataLog/Authenticate',
+  grpc.web.MethodType.UNARY,
+  proto.datalog.TokenRequest,
+  proto.datalog.TokenResponse,
+  /**
+   * @param {!proto.datalog.TokenRequest} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.datalog.TokenResponse.deserializeBinary
+);
+
+
+/**
+ * @param {!proto.datalog.TokenRequest} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @param {function(?grpc.web.RpcError, ?proto.datalog.TokenResponse)}
+ *     callback The callback function(error, response)
+ * @return {!grpc.web.ClientReadableStream<!proto.datalog.TokenResponse>|undefined}
+ *     The XHR Node Readable Stream
+ */
+proto.datalog.DataLogClient.prototype.authenticate =
+    function(request, metadata, callback) {
+  return this.client_.rpcCall(this.hostname_ +
+      '/datalog.DataLog/Authenticate',
+      request,
+      metadata || {},
+      methodDescriptor_DataLog_Authenticate,
+      callback);
+};
+
+
+/**
+ * @param {!proto.datalog.TokenRequest} request The
+ *     request proto
+ * @param {?Object<string, string>=} metadata User defined
+ *     call metadata
+ * @return {!Promise<!proto.datalog.TokenResponse>}
+ *     Promise that resolves to the response
+ */
+proto.datalog.DataLogPromiseClient.prototype.authenticate =
+    function(request, metadata) {
+  return this.client_.unaryCall(this.hostname_ +
+      '/datalog.DataLog/Authenticate',
+      request,
+      metadata || {},
+      methodDescriptor_DataLog_Authenticate);
+};
+
+
 module.exports = proto.datalog;
 
