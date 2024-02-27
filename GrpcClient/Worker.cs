@@ -44,12 +44,13 @@ public class Worker : BackgroundService
         {
             try
             {
-                var client = await GetGrpcClient();
+                var client = GetGrpcClient();
                 if (!IsAuthenticated())
                 {
                     if (!await Authenticate(client))
                     {
                         _logger.LogError("Failed to authenticate");
+                        break;
                     }
                 }
                 var headers = new Metadata();
@@ -116,7 +117,7 @@ public class Worker : BackgroundService
         }
         return false;
     }
-    private async Task<DataLog.DataLogClient> GetGrpcClient()
+    private DataLog.DataLogClient GetGrpcClient()
     {
         var serviceUrl = _configuration.GetValue<string>("ServiceUrl");
         var channel = GrpcChannel.ForAddress(serviceUrl);
