@@ -60,7 +60,7 @@ namespace GrpcService.Services
         {
             var credentials =  new CredentialModel
             {
-                UserName = request.Username,
+                UserName = request.UserName,
                 Password = request.Password
             };
             var result = await _tokenValidationService.GenerateTokenModelAsync(credentials);

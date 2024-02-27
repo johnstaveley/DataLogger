@@ -11,9 +11,9 @@ builder.Services.AddAuthentication()
   {
       cfg.TokenValidationParameters = new DataLogTokenValidationParameters(builder.Configuration);
   });
-//builder.Services.AddAuthorization();
+builder.Services.AddAuthorization();
 builder.Services.AddCors();
-builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = false)
+//builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = false)
     // TODO: Add in auth provider here
     ;
 builder.Services.AddGrpc(config => config.EnableDetailedErrors = true);

@@ -44,7 +44,7 @@ message DeveloperName {
 }
 
 message TokenRequest {
-	string Username = 1;
+	string UserName = 1;
 	string Password = 2;
 }
 

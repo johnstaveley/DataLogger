@@ -38,7 +38,7 @@ public class Worker : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        Thread.Sleep(5000); // Wait for the gRPC service to start
+        Thread.Sleep(8000); // Wait for the gRPC service to start
         var useStream = false;
         while (!stoppingToken.IsCancellationRequested)
         {
@@ -100,15 +100,17 @@ public class Worker : BackgroundService
     {
         try
         {
+            _logger.LogInformation("Authenticating");
             var tokenRequest = new TokenRequest
             {
-                Username = _configuration.GetValue<string>("UserName"),
-                Password = _configuration.GetValue<string>("Password")
+                UserName = _configuration.GetValue<string>("Settings:UserName"),
+                Password = _configuration.GetValue<string>("Settings:Password")
             };
             var tokenResponse = await client.AuthenticateAsync(tokenRequest);
             if (tokenResponse.Success) {
                 _token = tokenResponse.Token;
                 _tokenExpiry = tokenResponse.Expiry.ToDateTime();
+                _logger.LogInformation("Authenticated: Token received");
                 return true;
             }
         } catch (RpcException ex)
@@ -119,7 +121,7 @@ public class Worker : BackgroundService
     }
     private DataLog.DataLogClient GetGrpcClient()
     {
-        var serviceUrl = _configuration.GetValue<string>("ServiceUrl");
+        var serviceUrl = _configuration.GetValue<string>("Settings:ServiceUrl");
         var channel = GrpcChannel.ForAddress(serviceUrl);
         return new DataLog.DataLogClient(channel);
     }
