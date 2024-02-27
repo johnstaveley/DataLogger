@@ -35,17 +35,17 @@ public class JwtTokenValidationService
 
         if (user != null)
         {
-            var check = await _signInManager.CheckPasswordSignInAsync(user, model.Passcode, false);
+            var check = await _signInManager.CheckPasswordSignInAsync(user, model.Password, false);
 
             if (check.Succeeded)
             {
                 // Create the token
                 var claims = new[]
                 {
-        new Claim(JwtRegisteredClaimNames.Sub, user.Email),
-        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-        new Claim(JwtRegisteredClaimNames.UniqueName, user.UserName)
-      };
+                    new Claim(JwtRegisteredClaimNames.Sub, user.Email),
+                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                    new Claim(JwtRegisteredClaimNames.UniqueName, user.UserName)
+                };
 
                 var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Tokens:Key"]));
                 var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -60,11 +60,8 @@ public class JwtTokenValidationService
                 result.Token = new JwtSecurityTokenHandler().WriteToken(token);
                 result.Expiration = token.ValidTo;
                 result.Success = true;
-
             }
         }
-
-
         return result;
     }
 }

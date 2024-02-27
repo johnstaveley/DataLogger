@@ -1,11 +1,12 @@
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
+using GrpcService.Model;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 
 namespace GrpcService.Services
 {
-    //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class TelemetryService : DataLog.DataLogBase
     {
         private readonly JwtTokenValidationService _tokenValidationService;
@@ -55,9 +56,22 @@ namespace GrpcService.Services
         }
 
         [AllowAnonymous]
-        public override Task<TokenResponse> Authenticate(TokenRequest request, ServerCallContext context)
+        public override async Task<TokenResponse> Authenticate(TokenRequest request, ServerCallContext context)
         {
-            return base.Authenticate(request, context);
+            var credentials =  new CredentialModel
+            {
+                UserName = request.Username,
+                Password = request.Password
+            };
+            var result = await _tokenValidationService.GenerateTokenModelAsync(credentials);
+            if (result.Success)
+            {
+                return new TokenResponse { Success = true, Token = result.Token, Expiry = Timestamp.FromDateTime(result.Expiration) };
+            }
+            else
+            {
+                return new TokenResponse { Success = false, Token = "" };
+            }
         }
     }
 }

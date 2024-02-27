@@ -4,14 +4,14 @@ using GrpcService.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddCors();
-/*builder.Services.AddScoped<JwtTokenValidationService>();
+builder.Services.AddScoped<JwtTokenValidationService>();
 builder.Services.AddAuthentication()
   .AddJwtBearer(cfg =>
   {
       cfg.TokenValidationParameters = new DataLogTokenValidationParameters(builder.Configuration);
-  });*/
+  });
 builder.Services.AddAuthorization();
+builder.Services.AddCors();
 builder.Services.AddGrpc(config => config.EnableDetailedErrors = true);
 
 var app = builder.Build();
