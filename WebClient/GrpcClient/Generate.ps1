@@ -1,6 +1,6 @@
 npm install
 # Add tools to path
-if ($env:path -notcontains "grpc-tools") {
+if ($env:path -notmatch "grpc-tools") {
 	$env:path = $env:path + ";./node_modules/.bin/;./node_modules/grpc-tools/bin/;./node_modules/protoc-gen-grpc-web/bin/;"
 }
 # Remove old proxy files
@@ -16,4 +16,4 @@ $files = Get-ChildItem 'GrpcService/Protos/*'
 Get-ChildItem $files | Move-Item -Destination { $_.Directory.Parent.Parent.FullName }
 rmdir GrpcService -recurse -force
 # Build proxy files in development mode (This will prompt you to install some packages on the first run)
-#npx webpack -o ../wwwroot/js/datalog/ ./send.js --mode development
+npx webpack -o ../wwwroot/js/datalog/ ./send.js --mode development

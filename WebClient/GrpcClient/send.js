@@ -13,50 +13,22 @@ function addToLog(msg) {
     div.innerText = msg;
     theLog.appendChild(div);
 }
-
-function IsAuthenticated() {
-    return token != "" || tokenExpiry < new Date();
-}
-
-function Authenticate(client) {
-    try {
-        addToLog("Authenticating");
-        var tokenRequest = new TokenRequest
-        {
-            UserName = "grpcBot",
-                Password = "grpcBot1!"
-        };
-        var tokenResponse = client.AuthenticateAsync(tokenRequest);
-        if (tokenResponse.Success) {
-            token = tokenResponse.Token;
-            tokenExpiry = tokenResponse.Expiry.ToDateTime();
-            addToLog("Authenticated: Token received");
-            return true;
-        }
-    } catch (exception)
-    {
-        addToLog("Exception thrown");
-        console.log(exception);
-    }
-    return false;
-}
-
 theButton.addEventListener("click", function () {
     try {
         addToLog("Starting Service Call");
         const client = new DataLogClient("http://localhost:5138/");
         if (!IsAuthenticated()) {
-            Authenticate();
+            if (!Authenticate(client)) {
+                return;
+            }
         };
 
         const isAliveRequest = new IsAliveRequest();
         isAliveRequest.setName("John");
 
-        addToLog("Calling Service");
-        var headers = new Metadata();
-        headers.Add("Authorization", "Bearer " + token);
-
-        client.isAlive(isAliveRequest, {}, function (err, response) {
+        addToLog("Calling Service");        
+        let metadata = { "authorization": "Bearer " + token };
+        client.isAlive(isAliveRequest, metadata, function (err, response) {
             if (err) {
                 addToLog(`Error: ${err}`);
             } else {
@@ -69,3 +41,34 @@ theButton.addEventListener("click", function () {
         console.log(exception);
     }
 });
+
+function IsAuthenticated() {
+    return token != "" || tokenExpiry < new Date();
+}
+
+function Authenticate(client) {
+    try {
+        addToLog("Authenticating");
+        const tokenRequest = new TokenRequest();
+        tokenRequest.UserName = "grpcBot";
+        tokenRequest.Password = "grpcBot1!";
+        client.AuthenticateAsync(tokenRequest, function (err, response) {
+            console.log(response);
+            if (err) {
+                addToLog(`Error: ${err}`);
+            } else {
+                addToLog(`Success: ${response}`);
+                if (response.Success) {
+                    token = response.Token;
+                    tokenExpiry = response.Expiry.ToDateTime();
+                    addToLog("Authenticated: Token received");
+                    return true;
+                }
+            }
+        });
+    } catch (exception) {
+        addToLog("Exception thrown");
+        console.log(exception);
+    }
+    return false;
+}
