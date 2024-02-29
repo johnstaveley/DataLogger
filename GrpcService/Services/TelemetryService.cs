@@ -58,6 +58,7 @@ namespace GrpcService.Services
         [AllowAnonymous]
         public override async Task<TokenResponse> Authenticate(TokenRequest request, ServerCallContext context)
         {
+            _logger.LogInformation("Authenticating user {request}", request.UserName);
             var credentials =  new CredentialModel
             {
                 UserName = request.UserName,

@@ -16,12 +16,14 @@ function addToLog(msg) {
 theButton.addEventListener("click", function () {
     try {
         addToLog("Starting Service Call");
-        const client = new DataLogClient("http://localhost:5138/");
+        const client = new DataLogClient("https://localhost:7277/");
         if (!IsAuthenticated()) {
-            if (!Authenticate(client)) {
+            // TODO: These are not being passed by reference, fix so the function alters the values
+            if (!Authenticate(client, token, tokenExpiry)) {
                 return;
             }
         };
+        console.log(token, tokenExpiry);
 
         const isAliveRequest = new IsAliveRequest();
         isAliveRequest.setName("John");
@@ -43,32 +45,35 @@ theButton.addEventListener("click", function () {
 });
 
 function IsAuthenticated() {
-    return token != "" || tokenExpiry < new Date();
+    return token != "" && tokenExpiry > new Date();
 }
 
-function Authenticate(client) {
+function Authenticate(client, token, tokenExpiry) {
     try {
         addToLog("Authenticating");
+        token = "";
         const tokenRequest = new TokenRequest();
-        tokenRequest.UserName = "grpcBot";
-        tokenRequest.Password = "grpcBot1!";
-        client.AuthenticateAsync(tokenRequest, function (err, response) {
-            console.log(response);
+        tokenRequest.setUsername("grpcBot");
+        tokenRequest.setPassword("grpcBot1!");
+        client.authenticate(tokenRequest, null, function (err, response) {
             if (err) {
+                console.log(err);
                 addToLog(`Error: ${err}`);
+                return false;
             } else {
                 addToLog(`Success: ${response}`);
-                if (response.Success) {
-                    token = response.Token;
-                    tokenExpiry = response.Expiry.ToDateTime();
+                if (response.getSuccess()) {
+                    console.log("Authenticated: Token received");
+                    token = response.getToken();
+                    tokenExpiry = response.getExpiry();
                     addToLog("Authenticated: Token received");
-                    return true;
                 }
             }
         });
     } catch (exception) {
         addToLog("Exception thrown");
         console.log(exception);
+        return false;
     }
-    return false;
+    return true;
 }
