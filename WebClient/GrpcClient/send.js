@@ -1,77 +1,66 @@
 const { IsAliveRequest, IsAliveReply, ReadingRequest, SuccessResponse, DeveloperResponse, DeveloperName, TokenRequest, TokenResponse } = require("./datalog_pb.js");
-const { DataLogClient } = require("./datalog_grpc_web_pb.js");
+const { DataLogPromiseClient } = require("./datalog_grpc_web_pb.js");
 const { Timestamp } = require('google-protobuf/google/protobuf/timestamp_pb.js');
 const { Metadata } = require("./node_modules/@grpc/grpc-js/build/src/metadata.js");
 
 const theLog = document.getElementById("theLog");
 const theButton = document.getElementById("theButton");
-let token = "";
-let tokenExpiry = new Date();
+let tokenResponse = new TokenResponse();
 
 function addToLog(msg) {
     const div = document.createElement("div");
     div.innerText = msg;
     theLog.appendChild(div);
 }
-theButton.addEventListener("click", function () {
+theButton.addEventListener("click", async function () {
     try {
         addToLog("Starting Service Call");
-        const client = new DataLogClient("https://localhost:7277/");
-        if (!IsAuthenticated()) {
-            // TODO: These are not being passed by reference, fix so the function alters the values
-            if (!Authenticate(client, token, tokenExpiry)) {
+        const client = new DataLogPromiseClient("https://localhost:7277/");
+        if (!IsAuthenticated(tokenResponse)) {
+            await Authenticate(client, tokenResponse);
+            if (tokenResponse.getSuccess() == false)
+            {
                 return;
             }
         };
-        console.log(token, tokenExpiry);
+        console.log('authenticated', tokenResponse.getExpiry(), new Date());
 
         const isAliveRequest = new IsAliveRequest();
         isAliveRequest.setName("John");
 
         addToLog("Calling Service");        
-        let metadata = { "authorization": "Bearer " + token };
-        client.isAlive(isAliveRequest, metadata, function (err, response) {
-            if (err) {
-                addToLog(`Error: ${err}`);
-            } else {
-                addToLog(`Success: ${response}`);
-            }
-        });
-
+        let metadata = { "authorization": "Bearer " + tokenResponse.getToken() };
+        const response = await client.isAlive(isAliveRequest, metadata);
+        addToLog(`Success: ${response.getMessage()}`);
     } catch (exception) {
         addToLog("Exception thrown");
         console.log(exception);
     }
 });
 
-function IsAuthenticated() {
-    return token != "" && tokenExpiry > new Date();
+function IsAuthenticated(tokenResponse) {
+    return tokenResponse != null && tokenResponse.getToken() != "" && tokenResponse.getExpiry() > new Date();
 }
 
-function Authenticate(client, token, tokenExpiry) {
+async function Authenticate(client, tokenResponse) {
     try {
         addToLog("Authenticating");
-        token = "";
         const tokenRequest = new TokenRequest();
         tokenRequest.setUsername("grpcBot");
         tokenRequest.setPassword("grpcBot1!");
-        client.authenticate(tokenRequest, null, function (err, response) {
-            if (err) {
-                console.log(err);
-                addToLog(`Error: ${err}`);
-                return false;
-            } else {
-                addToLog(`Success: ${response}`);
-                if (response.getSuccess()) {
-                    console.log("Authenticated: Token received");
-                    token = response.getToken();
-                    tokenExpiry = response.getExpiry();
-                    addToLog("Authenticated: Token received");
-                }
-            }
-        });
+        const response = await client.authenticate(tokenRequest, {});
+        console.log(response);
+        if (response.getSuccess()) {
+            console.log("Authenticated: Token received");
+            tokenResponse.setSuccess(response.getSuccess());
+            tokenResponse.setToken(response.getToken());
+            tokenResponse.setExpiry(response.getExpiry());
+            addToLog("Authenticated: Token received");
+        } else {
+            addToLog("Authentication failed");
+        };
     } catch (exception) {
-        addToLog("Exception thrown");
+        addToLog("Authentication: Exception thrown");
         console.log(exception);
         return false;
     }
