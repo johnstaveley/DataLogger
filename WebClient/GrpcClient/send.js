@@ -3,18 +3,18 @@ const { DataLogPromiseClient } = require("./datalog_grpc_web_pb.js");
 const { Timestamp } = require('google-protobuf/google/protobuf/timestamp_pb.js');
 const { Metadata } = require("./node_modules/@grpc/grpc-js/build/src/metadata.js");
 
-const theLog = document.getElementById("theLog");
-const theButton = document.getElementById("theButton");
+const myLog = document.getElementById("logDisplay");
+const nameInput = document.getElementById("name");
+const sendButton = document.getElementById("sendButton");
 let tokenResponse = new TokenResponse();
 
 function addToLog(msg) {
     const div = document.createElement("div");
     div.innerText = msg;
-    theLog.appendChild(div);
+    myLog.appendChild(div);
 }
-theButton.addEventListener("click", async function () {
+sendButton.addEventListener("click", async function () {
     try {
-        addToLog("Starting Service Call");
         const client = new DataLogPromiseClient("https://localhost:7277/");
         if (!IsAuthenticated(tokenResponse)) {
             await Authenticate(client, tokenResponse);
@@ -23,23 +23,22 @@ theButton.addEventListener("click", async function () {
                 return;
             }
         };
-        console.log('authenticated', tokenResponse.getExpiry(), new Date());
-
         const isAliveRequest = new IsAliveRequest();
-        isAliveRequest.setName("John");
+        let name = nameInput.value || "Anonymous";
+        isAliveRequest.setName(name);
 
-        addToLog("Calling Service");        
+        addToLog("Calling Service");
         let metadata = { "authorization": "Bearer " + tokenResponse.getToken() };
         const response = await client.isAlive(isAliveRequest, metadata);
-        addToLog(`Success: ${response.getMessage()}`);
+        addToLog(`Service call Success: ${response.getMessage()}`);
     } catch (exception) {
-        addToLog("Exception thrown");
+        addToLog("Service call Exception thrown");
         console.log(exception);
     }
 });
 
 function IsAuthenticated(tokenResponse) {
-    return tokenResponse != null && tokenResponse.getToken() != "" && tokenResponse.getExpiry() > new Date();
+    return tokenResponse != null && tokenResponse.getToken() != "" && tokenResponse.getExpiry().toDate() > new Date();
 }
 
 async function Authenticate(client, tokenResponse) {
@@ -49,9 +48,8 @@ async function Authenticate(client, tokenResponse) {
         tokenRequest.setUsername("grpcBot");
         tokenRequest.setPassword("grpcBot1!");
         const response = await client.authenticate(tokenRequest, {});
-        console.log(response);
         if (response.getSuccess()) {
-            console.log("Authenticated: Token received");
+            console.log("Authenticated: Token received. Expires at " + response.getExpiry().toDate());
             tokenResponse.setSuccess(response.getSuccess());
             tokenResponse.setToken(response.getToken());
             tokenResponse.setExpiry(response.getExpiry());
