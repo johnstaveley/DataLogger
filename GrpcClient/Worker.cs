@@ -71,7 +71,7 @@ public class Worker : BackgroundService
                         reply = stream.ResponseStream.Current;
                         if (_logger.IsEnabled(LogLevel.Information))
                         {
-                            _logger.LogInformation("Response {reply} running at: {time}", reply.IsSuccess, DateTimeOffset.Now);
+                            _logger.LogInformation("Send reading response {reply} running at: {time}", reply.IsSuccess, DateTimeOffset.Now);
                         }
                     }
                 }
@@ -81,7 +81,7 @@ public class Worker : BackgroundService
                     reply = await client.SubmitReadingAsync(readingRequest, headers);
                     if (_logger.IsEnabled(LogLevel.Information))
                     {
-                        _logger.LogInformation("Response {reply} running at: {time}", reply.IsSuccess, DateTimeOffset.Now);
+                        _logger.LogInformation("Send reading response {reply} running at: {time}", reply.IsSuccess, DateTimeOffset.Now);
                     }
                 }
                 await Task.Delay(1000, stoppingToken);
