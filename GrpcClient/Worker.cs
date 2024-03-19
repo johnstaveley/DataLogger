@@ -121,7 +121,9 @@ public class Worker : BackgroundService
     }
     private DataLog.DataLogClient GetGrpcClient()
     {
+        AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
         var serviceUrl = _configuration.GetValue<string>("Settings:ServiceUrl");
+        _logger.LogInformation($"Attempting to connect on {serviceUrl}");
         var channel = GrpcChannel.ForAddress(serviceUrl);
         return new DataLog.DataLogClient(channel);
     }
