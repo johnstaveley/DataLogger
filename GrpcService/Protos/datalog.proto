@@ -15,19 +15,19 @@ service DataLog {
 }
 
 message IsAliveRequest {
-	string name = 1;
+	string Name = 1;
 }
 
 message IsAliveReply {
-	string message = 1;
+	string Message = 1;
 }
 
 message ReadingRequest {
-	string metername = 1;
-	double temperature = 2;
-	double humidity = 3;
-	double pressure = 4;
-	google.protobuf.Timestamp timestamp = 5;
+	string MeterName = 1;
+	double Temperature = 2;
+	double Humidity = 3;
+	double Pressure = 4;
+	google.protobuf.Timestamp Timestamp = 5;
 }
 
 message SuccessResponse {
@@ -36,11 +36,11 @@ message SuccessResponse {
 }
 
 message DeveloperResponse {
-	repeated DeveloperName developers = 1;
+	repeated DeveloperName Developers = 1;
 }
 
 message DeveloperName {
-	string name = 1;
+	string Name = 1;
 }
 
 message TokenRequest {
