@@ -308,7 +308,7 @@ proto.datalog.IsAliveRequest.serializeBinaryToWriter = function(message, writer)
 
 
 /**
- * optional string name = 1;
+ * optional string Name = 1;
  * @return {string}
  */
 proto.datalog.IsAliveRequest.prototype.getName = function() {
@@ -438,7 +438,7 @@ proto.datalog.IsAliveReply.serializeBinaryToWriter = function(message, writer) {
 
 
 /**
- * optional string message = 1;
+ * optional string Message = 1;
  * @return {string}
  */
 proto.datalog.IsAliveReply.prototype.getMessage = function() {
@@ -618,7 +618,7 @@ proto.datalog.ReadingRequest.serializeBinaryToWriter = function(message, writer)
 
 
 /**
- * optional string metername = 1;
+ * optional string MeterName = 1;
  * @return {string}
  */
 proto.datalog.ReadingRequest.prototype.getMetername = function() {
@@ -636,7 +636,7 @@ proto.datalog.ReadingRequest.prototype.setMetername = function(value) {
 
 
 /**
- * optional double temperature = 2;
+ * optional double Temperature = 2;
  * @return {number}
  */
 proto.datalog.ReadingRequest.prototype.getTemperature = function() {
@@ -654,7 +654,7 @@ proto.datalog.ReadingRequest.prototype.setTemperature = function(value) {
 
 
 /**
- * optional double humidity = 3;
+ * optional double Humidity = 3;
  * @return {number}
  */
 proto.datalog.ReadingRequest.prototype.getHumidity = function() {
@@ -672,7 +672,7 @@ proto.datalog.ReadingRequest.prototype.setHumidity = function(value) {
 
 
 /**
- * optional double pressure = 4;
+ * optional double Pressure = 4;
  * @return {number}
  */
 proto.datalog.ReadingRequest.prototype.getPressure = function() {
@@ -690,7 +690,7 @@ proto.datalog.ReadingRequest.prototype.setPressure = function(value) {
 
 
 /**
- * optional google.protobuf.Timestamp timestamp = 5;
+ * optional google.protobuf.Timestamp Timestamp = 5;
  * @return {?proto.google.protobuf.Timestamp}
  */
 proto.datalog.ReadingRequest.prototype.getTimestamp = function() {
@@ -1009,7 +1009,7 @@ proto.datalog.DeveloperResponse.serializeBinaryToWriter = function(message, writ
 
 
 /**
- * repeated DeveloperName developers = 1;
+ * repeated DeveloperName Developers = 1;
  * @return {!Array<!proto.datalog.DeveloperName>}
  */
 proto.datalog.DeveloperResponse.prototype.getDevelopersList = function() {
@@ -1159,7 +1159,7 @@ proto.datalog.DeveloperName.serializeBinaryToWriter = function(message, writer) 
 
 
 /**
- * optional string name = 1;
+ * optional string Name = 1;
  * @return {string}
  */
 proto.datalog.DeveloperName.prototype.getName = function() {

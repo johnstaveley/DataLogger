@@ -15,7 +15,7 @@ function addToLog(msg) {
 }
 sendButton.addEventListener("click", async function () {
     try {
-        const client = new DataLogPromiseClient("https://localhost:7277/");
+        const client = new DataLogPromiseClient("https://localhost:8081/");
         if (!IsAuthenticated(tokenResponse)) {
             await Authenticate(client, tokenResponse);
             if (tokenResponse.getSuccess() == false)
