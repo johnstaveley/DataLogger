@@ -71,7 +71,7 @@ public class Worker : BackgroundService
                         reply = stream.ResponseStream.Current;
                         if (_logger.IsEnabled(LogLevel.Information))
                         {
-                            _logger.LogInformation("Send reading response {reply} running at: {time}", reply.IsSuccess, DateTimeOffset.Now);
+                            _logger.LogInformation("Sent reading. Response '{reply}' @ {time:dd/MM/yyyy HH:mm:ss}", reply.IsSuccess, DateTimeOffset.Now);
                         }
                     }
                 }
@@ -81,7 +81,7 @@ public class Worker : BackgroundService
                     reply = await client.SubmitReadingAsync(readingRequest, headers);
                     if (_logger.IsEnabled(LogLevel.Information))
                     {
-                        _logger.LogInformation("Send reading response {reply} running at: {time}", reply.IsSuccess, DateTimeOffset.Now);
+                        _logger.LogInformation("Sent reading. Response '{reply}' @ {time:dd/MM/yyyy HH:mm:ss}", reply.IsSuccess, DateTimeOffset.Now);
                     }
                 }
                 await Task.Delay(1000, stoppingToken);
@@ -123,7 +123,7 @@ public class Worker : BackgroundService
     {
         AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
         var serviceUrl = _configuration.GetValue<string>("Settings:ServiceUrl");
-        _logger.LogInformation($"Attempting to connect on {serviceUrl}");
+        _logger.LogDebug($"Attempting to connect on {serviceUrl}");
         var channel = GrpcChannel.ForAddress(serviceUrl);
         return new DataLog.DataLogClient(channel);
     }
