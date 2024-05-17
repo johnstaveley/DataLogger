@@ -17,9 +17,17 @@ service DataLog {
 message IsAliveRequest {
 	string Name = 1;
 }
-
 message IsAliveReply {
 	string Message = 1;
+}
+message TokenRequest {
+	string UserName = 1;
+	string Password = 2;
+}
+message TokenResponse {
+	bool Success = 1;
+	string Token = 2;
+	google.protobuf.Timestamp Expiry = 3;
 }
 
 message ReadingRequest {
@@ -28,6 +36,7 @@ message ReadingRequest {
 	double Humidity = 3;
 	double Pressure = 4;
 	google.protobuf.Timestamp Timestamp = 5;
+	reserved 6 to 8;
 }
 
 message SuccessResponse {
@@ -43,13 +52,3 @@ message DeveloperName {
 	string Name = 1;
 }
 
-message TokenRequest {
-	string UserName = 1;
-	string Password = 2;
-}
-
-message TokenResponse {
-	bool Success = 1;
-	string Token = 2;
-	google.protobuf.Timestamp Expiry = 3;
-}
