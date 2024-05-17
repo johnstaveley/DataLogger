@@ -1,6 +1,8 @@
 using Grpc.Core;
 using Grpc.Net.Client;
 using GrpcService;
+using System.Net.Http.Headers;
+using static GrpcService.DataLog;
 
 namespace GrpcClient;
 
@@ -45,18 +47,8 @@ public class Worker : BackgroundService
             try
             {
                 var client = GetGrpcClient();
-                if (!IsAuthenticated())
-                {
-                    if (!await Authenticate(client))
-                    {
-                        _logger.LogError("Failed to authenticate");
-                        break;
-                    }
-                }
-                var headers = new Metadata
-                {
-                    { "Authorization", $"Bearer {_token}" }
-                };
+                var headers = await GetHeaders(client);
+                if (headers == null) break;
                 SuccessResponse reply;
                 if (useStream)
                 {
@@ -73,7 +65,7 @@ public class Worker : BackgroundService
                         reply = stream.ResponseStream.Current;
                         if (_logger.IsEnabled(LogLevel.Information))
                         {
-                            _logger.LogInformation("Sent reading. Response '{reply}' @ {time:dd/MM/yyyy HH:mm:ss}", reply.IsSuccess, DateTimeOffset.Now);
+                            _logger.LogInformation("Sent reading. Response Received '{reply}' @ {time:dd/MM/yyyy HH:mm:ss}", reply.IsSuccess, DateTimeOffset.Now);
                         }
                     }
                 }
@@ -83,7 +75,7 @@ public class Worker : BackgroundService
                     reply = await client.SubmitReadingAsync(readingRequest, headers);
                     if (_logger.IsEnabled(LogLevel.Information))
                     {
-                        _logger.LogInformation("Sent reading. Response '{reply}' @ {time:dd/MM/yyyy HH:mm:ss}", reply.IsSuccess, DateTimeOffset.Now);
+                        _logger.LogInformation("Sent reading. Response received '{reply}' @ {time:dd/MM/yyyy HH:mm:ss}", reply.IsSuccess, DateTimeOffset.Now);
                     }
                 }
                 await Task.Delay(1000, stoppingToken);
@@ -93,6 +85,22 @@ public class Worker : BackgroundService
                 _logger.LogError("Error calling gRPC service: {Message}", ex.Message);
             }
         }
+    }
+    private async Task<Metadata> GetHeaders(DataLogClient client)
+    {
+        if (!IsAuthenticated())
+        {
+            if (!await Authenticate(client))
+            {
+                _logger.LogError("Failed to authenticate");
+                return null;
+            }
+        }
+        return new Metadata
+                {
+                    { "Authorization", $"Bearer {_token}" }
+                };
+
     }
     private bool IsAuthenticated()
     {
@@ -109,13 +117,15 @@ public class Worker : BackgroundService
                 Password = _configuration.GetValue<string>("Settings:Password")
             };
             var tokenResponse = await client.AuthenticateAsync(tokenRequest);
-            if (tokenResponse.Success) {
+            if (tokenResponse.Success)
+            {
                 _token = tokenResponse.Token;
                 _tokenExpiry = tokenResponse.Expiry.ToDateTime();
                 _logger.LogInformation("Authenticated: Token received");
                 return true;
             }
-        } catch (RpcException ex)
+        }
+        catch (RpcException ex)
         {
             _logger.LogError("Error authenticating: {Message}", ex.Message);
         }

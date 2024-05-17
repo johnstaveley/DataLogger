@@ -20,7 +20,6 @@ builder.Services.AddCors(cfg =>
                .AllowAnyHeader();
     });
 });
-builder.Services.AddGrpc();
 
 // TODO: Might want to add in an actual authorization provider here
 //builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = false)
