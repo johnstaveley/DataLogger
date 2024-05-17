@@ -20,6 +20,7 @@ message IsAliveRequest {
 message IsAliveReply {
 	string Message = 1;
 }
+
 message TokenRequest {
 	string UserName = 1;
 	string Password = 2;

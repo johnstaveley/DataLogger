@@ -53,8 +53,10 @@ public class Worker : BackgroundService
                         break;
                     }
                 }
-                var headers = new Metadata();
-                headers.Add("Authorization", $"Bearer {_token}");
+                var headers = new Metadata
+                {
+                    { "Authorization", $"Bearer {_token}" }
+                };
                 SuccessResponse reply;
                 if (useStream)
                 {
