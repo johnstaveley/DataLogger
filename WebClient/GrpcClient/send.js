@@ -8,11 +8,13 @@ const nameInput = document.getElementById("name");
 const sendButton = document.getElementById("sendButton");
 let tokenResponse = new TokenResponse();
 
+// Write a string to the log div to update the user with progress
 function addToLog(msg) {
     const div = document.createElement("div");
     div.innerText = msg;
     myLog.appendChild(div);
 }
+// Attachs a click event to the button to create a connection to the grpc endpoint
 sendButton.addEventListener("click", async function () {
     try {
         const client = new DataLogPromiseClient("https://localhost:8081/");
