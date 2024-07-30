@@ -47,12 +47,12 @@ public class Worker : BackgroundService
             try
             {
                 var client = GetGrpcClient();
-                var headers = await GetHeaders(client);
-                if (headers == null) break;
+                var securityToken = await GetSecurityToken(client);
+                if (securityToken == null) break;
                 SuccessResponse reply;
                 if (useStream)
                 {
-                    var stream = client.SubmitStream(headers);
+                    var stream = client.SubmitStream(securityToken);
                     for (int i = 0; i < 10; i++)
                     {
                         var readingRequest = _generator.NewReading();
@@ -72,7 +72,7 @@ public class Worker : BackgroundService
                 else
                 {
                     var readingRequest = _generator.NewReading();
-                    reply = await client.SubmitReadingAsync(readingRequest, headers);
+                    reply = await client.SubmitReadingAsync(readingRequest, securityToken);
                     if (_logger.IsEnabled(LogLevel.Information))
                     {
                         _logger.LogInformation("Sent reading. Response received '{reply}' @ {time:dd/MM/yyyy HH:mm:ss}", reply.IsSuccess, DateTimeOffset.Now);
@@ -86,7 +86,7 @@ public class Worker : BackgroundService
             }
         }
     }
-    private async Task<Metadata> GetHeaders(DataLogClient client)
+    private async Task<Metadata> GetSecurityToken(DataLogClient client)
     {
         if (!IsAuthenticated())
         {
