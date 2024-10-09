@@ -136,7 +136,11 @@ public class Worker : BackgroundService
         AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
         var serviceUrl = _configuration.GetValue<string>("Settings:ServiceUrl");
         _logger.LogDebug($"Attempting to connect on {serviceUrl}");
-        var channel = GrpcChannel.ForAddress(serviceUrl);
+        var httpHandler = new HttpClientHandler();
+        #if DEBUG
+        httpHandler.ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
+        #endif
+        var channel = GrpcChannel.ForAddress(serviceUrl, new GrpcChannelOptions { HttpHandler = httpHandler });
         return new DataLog.DataLogClient(channel);
     }
 }
